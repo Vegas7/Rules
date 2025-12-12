@@ -1,0 +1,2 @@
+# Rules
+self use
