@@ -47,26 +47,24 @@ jobs:
               data = response.json()
 
               lines = []
+              # 仅保留头部说明信息
               lines.append('# Tailscale DERP List')
               lines.append(f'# Updated: {datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")} UTC')
-              lines.append('# Source: https://login.tailscale.com/derpmap/default')
               lines.append('')
 
               regions = data.get('Regions', {})
               for region_id, region_data in regions.items():
-                  region_code = region_data.get('RegionCode', 'Unknown')
-                  region_name = region_data.get('RegionName', 'Unknown')
-                  
+                  # 遍历节点，只提取 IPv4 地址并生成标准规则
                   for node in region_data.get('Nodes', []):
                       ipv4 = node.get('IPv4')
                       if ipv4:
-                          # 生成 Surge 规则
-                          lines.append(f'IP-CIDR,{ipv4}/32,no-resolve,comment={region_code}-{region_name}')
+                          # 修改点：去掉了末尾的 comment 注释
+                          lines.append(f'IP-CIDR,{ipv4}/32,no-resolve')
 
               with open(FILE_PATH, 'w', encoding='utf-8') as f:
                   f.write('\n'.join(lines))
               
-              print(f'Successfully wrote {len(lines)-4} rules to {FILE_PATH}')
+              print(f'Successfully wrote rules to {FILE_PATH}')
 
           except Exception as e:
               print(f'Error: {e}')
@@ -78,7 +76,6 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # 检查是否有文件变动
           if [ -n "$(git status --porcelain)" ]; then
             git add Surge/tailscale_derp.conf
             git commit -m "Auto-update Tailscale DERP list [$(date +'%Y-%m-%d')]"
