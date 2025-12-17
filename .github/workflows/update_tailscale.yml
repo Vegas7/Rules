@@ -1,0 +1,68 @@
+name: Update Tailscale DERP List (IPv4 Only)
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # 每天 UTC 0点 (北京时间 8:00) 运行
+  workflow_dispatch: # 允许手动点击运行
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repo
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Fetch and Generate Rules
+      run: |
+        python3 -c "
+        import urllib.request
+        import json
+        import datetime
+
+        url = 'https://login.tailscale.com/derpmap/default'
+        
+        try:
+            with urllib.request.urlopen(url) as r:
+                data = json.loads(r.read().decode())
+            
+            lines = []
+            lines.append('# Tailscale Official DERP List (IPv4 Only)')
+            lines.append(f'# Updated: {datetime.datetime.now(datetime.timezone.utc).strftime(\"%Y-%m-%d %H:%M:%S UTC\")}')
+            lines.append('')
+
+            for region in data['Regions'].values():
+                region_code = region.get('RegionCode', 'Unknown')
+                for node in region.get('Nodes', []):
+                    # 只提取 IPv4
+                    ipv4 = node.get('IPv4')
+                    if ipv4:
+                        # 格式: IP-CIDR,1.2.3.4/32,no-resolve
+                        lines.append(f'IP-CIDR,{ipv4}/32,no-resolve // Region: {region_code}')
+
+            # 写入文件
+            with open('tailscale_derp.list', 'w') as f:
+                f.write('\n'.join(lines))
+            
+            print(f'Successfully generated {len(lines)} rules.')
+
+        except Exception as e:
+            print(f'Error: {e}')
+            exit(1)
+        "
+
+    - name: Commit and Push changes
+      run: |
+        git config --global user.name 'GitHub Actions'
+        git config --global user.email 'actions@github.com'
+        git add tailscale_derp.list
+        # 只有当文件有变动时才提交
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update Tailscale DERP IPv4 list" && git push)
