@@ -1,4 +1,4 @@
-name: Update Surge Rules
+name: update_tailscale_IP
 
 on:
   schedule:
