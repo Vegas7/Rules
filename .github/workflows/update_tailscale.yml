@@ -27,10 +27,19 @@ jobs:
         import urllib.request
         import json
         import datetime
+        import os
 
         url = 'https://login.tailscale.com/derpmap/default'
         
+        # 定义输出路径和文件名
+        output_dir = 'Rules/Surge'
+        filename = 'tailscale_derp.conf'
+        file_path = os.path.join(output_dir, filename)
+
         try:
+            # 确保目录存在，不存在则创建
+            os.makedirs(output_dir, exist_ok=True)
+
             with urllib.request.urlopen(url) as r:
                 data = json.loads(r.read().decode())
             
@@ -48,11 +57,11 @@ jobs:
                         # 格式: IP-CIDR,1.2.3.4/32,no-resolve
                         lines.append(f'IP-CIDR,{ipv4}/32,no-resolve // Region: {region_code}')
 
-            # 写入文件
-            with open('tailscale_derp.list', 'w') as f:
+            # 写入文件到指定目录
+            with open(file_path, 'w') as f:
                 f.write('\n'.join(lines))
             
-            print(f'Successfully generated {len(lines)} rules.')
+            print(f'Successfully generated {len(lines)} rules in {file_path}.')
 
         except Exception as e:
             print(f'Error: {e}')
@@ -63,6 +72,7 @@ jobs:
       run: |
         git config --global user.name 'GitHub Actions'
         git config --global user.email 'actions@github.com'
-        git add tailscale_derp.list
+        # 注意这里 add 的路径也变了
+        git add Rules/Surge/tailscale_derp.conf
         # 只有当文件有变动时才提交
-        git diff --quiet && git diff --staged --quiet || (git commit -m "Update Tailscale DERP IPv4 list" && git push)
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Update Tailscale DERP list" && git push)
