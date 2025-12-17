@@ -1,53 +1,98 @@
-name: update_tailscale_IP
+name: Update Tailscale DERP List
 
 on:
   schedule:
-    # 每天北京时间早上 6:00 运行 (UTC 22:00)
+    # 北京时间 06:00 对应 UTC 22:00 (前一天)
     - cron: '0 22 * * *'
-  workflow_dispatch: # 允许手动点击按钮触发
+  workflow_dispatch: # 允许手动点击按钮触发测试
+
+permissions:
+  contents: write
 
 jobs:
-  update-rules:
+  update-derp:
     runs-on: ubuntu-latest
     
-    # 赋予 GITHUB_TOKEN 写权限，防止 push 失败
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout code (检出代码)
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Python (设置 Python 环境)
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.x'
 
-      - name: Install dependencies (安装依赖)
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Fetch and Generate Surge Rules
         run: |
-          python -m pip install --upgrade pip
-          pip install requests pyyaml
+          python -c "
+          import requests
+          import json
+          import os
+          from datetime import datetime
 
-      - name: Run script (运行脚本)
-        # 这一步运行根目录下的 main.py
-        # 你的 Python 脚本里 output_dir 应该写为 './Surge' 或 'Surge'
-        run: python main.py
+          # 目标文件路径
+          FILE_PATH = 'Surge/tailscale_derp.conf'
+          DIR_NAME = os.path.dirname(FILE_PATH)
 
-      - name: Commit and push changes (提交更改)
+          # 确保目录存在
+          if not os.path.exists(DIR_NAME):
+              os.makedirs(DIR_NAME)
+
+          try:
+              print('Fetching DERP map...')
+              response = requests.get('https://login.tailscale.com/derpmap/default')
+              response.raise_for_status()
+              data = response.json()
+
+              lines = []
+              lines.append('# Tailscale DERP List')
+              lines.append(f'# Updated: {datetime.now().strftime(\"%Y-%m-%d %H:%M:%S\")} UTC')
+              lines.append('# Source: https://login.tailscale.com/derpmap/default')
+              lines.append('')
+
+              # 遍历 Regions 和 Nodes
+              regions = data.get('Regions', {})
+              for region_id, region_data in regions.items():
+                  region_code = region_data.get('RegionCode', 'Unknown')
+                  region_name = region_data.get('RegionName', 'Unknown')
+                  
+                  for node in region_data.get('Nodes', []):
+                      ipv4 = node.get('IPv4')
+                      if ipv4:
+                          # 生成 Surge 规则: IP-CIDR,1.2.3.4/32,no-resolve,comment=xxx
+                          # 注意：Tailscale 连接通常使用 IP 直连，建议加上 no-resolve
+                          line = f'IP-CIDR,{ipv4}/32,no-resolve,options=detour' 
+                          # 这里暂时没有指定策略名，因为通常是在 Rule Set 引用时指定，或者你可以改成 DIRECT
+                          # 如果需要在文件内指定策略为 DIRECT，请将下方代码改为:
+                          # line = f'IP-CIDR,{ipv4}/32,DIRECT,no-resolve' 
+                          
+                          # 为了纯净规则集，这里只输出标准格式，方便在 Surge 的 Rule Set 中引用
+                          lines.append(f'IP-CIDR,{ipv4}/32,no-resolve,comment={region_code}-{region_name}')
+
+              # 写入文件
+              with open(FILE_PATH, 'w', encoding='utf-8') as f:
+                  f.write('\n'.join(lines))
+              
+              print(f'Successfully wrote {len(lines)-4} rules to {FILE_PATH}')
+
+          except Exception as e:
+              print(f'Error: {e}')
+              exit(1)
+          "
+
+      - name: Commit and Push changes
         run: |
-          # 配置 Git 用户信息
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # 关键点：只添加 Surge 文件夹下的变动
-          # 这会忽略掉可能意外生成的其他错误文件夹
-          git add Surge/
-
-          # 检查是否有变动
-          if git diff --staged --quiet; then
-            echo "No changes detected. Skipping commit."
-          else
-            echo "Changes detected. Committing..."
-            git commit -m "Auto-update Surge rules [$(date '+%Y-%m-%d %H:%M:%S')]"
+          # 检查是否有文件变动
+          if [ -n "$(git status --porcelain)" ]; then
+            git add Surge/tailscale_derp.conf
+            git commit -m "Auto-update Tailscale DERP list [$(date +'%Y-%m-%d')]"
             git push
+          else
+            print("No changes detected, skipping commit.")
           fi
