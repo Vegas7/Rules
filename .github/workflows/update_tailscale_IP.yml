@@ -37,7 +37,6 @@ jobs:
           FILE_PATH = 'Surge/tailscale_derp.conf'
           DIR_NAME = os.path.dirname(FILE_PATH)
 
-          # 确保目录存在
           if not os.path.exists(DIR_NAME):
               os.makedirs(DIR_NAME)
 
@@ -53,7 +52,6 @@ jobs:
               lines.append('# Source: https://login.tailscale.com/derpmap/default')
               lines.append('')
 
-              # 遍历 Regions 和 Nodes
               regions = data.get('Regions', {})
               for region_id, region_data in regions.items():
                   region_code = region_data.get('RegionCode', 'Unknown')
@@ -62,17 +60,9 @@ jobs:
                   for node in region_data.get('Nodes', []):
                       ipv4 = node.get('IPv4')
                       if ipv4:
-                          # 生成 Surge 规则: IP-CIDR,1.2.3.4/32,no-resolve,comment=xxx
-                          # 注意：Tailscale 连接通常使用 IP 直连，建议加上 no-resolve
-                          line = f'IP-CIDR,{ipv4}/32,no-resolve,options=detour' 
-                          # 这里暂时没有指定策略名，因为通常是在 Rule Set 引用时指定，或者你可以改成 DIRECT
-                          # 如果需要在文件内指定策略为 DIRECT，请将下方代码改为:
-                          # line = f'IP-CIDR,{ipv4}/32,DIRECT,no-resolve' 
-                          
-                          # 为了纯净规则集，这里只输出标准格式，方便在 Surge 的 Rule Set 中引用
+                          # 生成 Surge 规则
                           lines.append(f'IP-CIDR,{ipv4}/32,no-resolve,comment={region_code}-{region_name}')
 
-              # 写入文件
               with open(FILE_PATH, 'w', encoding='utf-8') as f:
                   f.write('\n'.join(lines))
               
@@ -94,5 +84,5 @@ jobs:
             git commit -m "Auto-update Tailscale DERP list [$(date +'%Y-%m-%d')]"
             git push
           else
-            print("No changes detected, skipping commit.")
+            echo "No changes detected, skipping commit."
           fi
