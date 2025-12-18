@@ -43,7 +43,8 @@ jobs:
           # 映射关系 (Surge -> Mihomo)
           TYPE_MAPPING = {
               'DEST-PORT': 'DST-PORT',
-              'URL-REGEX': 'DOMAIN-REGEX'
+              'URL-REGEX': 'DOMAIN-REGEX',
+              'PROTOCOL': 'NETWORK'  # Surge用PROTOCOL, Mihomo通常用NETWORK
           }
 
           def process_line(line):
@@ -59,17 +60,26 @@ jobs:
                   line = parts[0].strip()
                   comment = " //" + parts[1]
               
-              # 处理逻辑规则 (AND, OR, NOT)
+              # --- 处理逻辑规则 (AND, OR, NOT) ---
+              # 逻辑规则结构: AND,((Type,Val),(Type,Val)),Policy
+              # 我们需要保留最后一个 ')' 及其左边的所有内容，丢弃右边的 Policy
               if line.upper().startswith(('AND', 'OR', 'NOT')):
-                  last_comma_index = line.rfind(',')
-                  if last_comma_index != -1:
-                      rule_part = line[:last_comma_index]
+                  # 寻找最后一个右括号
+                  last_paren_index = line.rfind(')')
+                  if last_paren_index != -1:
+                      # 截取到最后一个右括号为止 (包含该括号)
+                      rule_part = line[:last_paren_index + 1]
+                      
+                      # 替换关键词
                       for s_key, m_key in TYPE_MAPPING.items():
                           rule_part = rule_part.replace(s_key, m_key)
+                      
                       return rule_part + comment
-                  return line 
+                  else:
+                      # 如果没有括号，可能是格式错误，原样返回防止崩溃
+                      return line 
 
-              # 处理普通规则
+              # --- 处理普通规则 ---
               parts = [p.strip() for p in line.split(',')]
               
               if len(parts) < 2:
@@ -77,12 +87,14 @@ jobs:
 
               rule_type = parts[0].upper()
               
+              # 映射类型名称
               if rule_type in TYPE_MAPPING:
                   parts[0] = TYPE_MAPPING[rule_type]
 
               is_no_resolve = 'no-resolve' in [p.lower() for p in parts]
               
               # 重组规则：保留 类型 和 值，去除策略组
+              # 例如: DOMAIN-SUFFIX, google.com, Proxy -> DOMAIN-SUFFIX, google.com
               new_line = f"{parts[0]},{parts[1]}"
               
               if is_no_resolve:
@@ -102,6 +114,7 @@ jobs:
               
               new_lines = []
               for line in lines:
+                  # 跳过 [Rule] 或 [General] 等段落标记
                   if line.strip().startswith('[') and line.strip().endswith(']'):
                       continue
                   
@@ -140,7 +153,6 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add Mihomo/*.txt
           
-          # 检查是否有变更，如果有则提交
           if git diff --staged --quiet; then
             echo "No changes to commit."
           else
