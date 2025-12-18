@@ -41,7 +41,6 @@ jobs:
               os.makedirs(TARGET_DIR)
 
           # 映射关系 (Surge -> Mihomo)
-          # 注意：Mihomo 使用 DST-PORT 而不是 DEST-PORT
           TYPE_MAPPING = {
               'DEST-PORT': 'DST-PORT',
               'URL-REGEX': 'DOMAIN-REGEX'
@@ -61,21 +60,16 @@ jobs:
                   comment = " //" + parts[1]
               
               # 处理逻辑规则 (AND, OR, NOT)
-              # 逻辑规则通常包含括号，格式如: AND,((DEST-PORT,443),...),Proxy
               if line.upper().startswith(('AND', 'OR', 'NOT')):
-                  # 找到最后一个逗号，这通常是分隔 规则 和 策略组 的地方
                   last_comma_index = line.rfind(',')
                   if last_comma_index != -1:
-                      # 截取掉策略组部分
                       rule_part = line[:last_comma_index]
-                      # 替换关键词 (如 DEST-PORT -> DST-PORT)
                       for s_key, m_key in TYPE_MAPPING.items():
                           rule_part = rule_part.replace(s_key, m_key)
                       return rule_part + comment
-                  return line # 如果找不到逗号，可能本身就没有策略组，原样返回
+                  return line 
 
-              # 处理普通规则 (DOMAIN, IP-CIDR, etc.)
-              # 格式: TYPE,VALUE,POLICY,OPTIONS(optional)
+              # 处理普通规则
               parts = [p.strip() for p in line.split(',')]
               
               if len(parts) < 2:
@@ -83,15 +77,12 @@ jobs:
 
               rule_type = parts[0].upper()
               
-              # 映射类型名称
               if rule_type in TYPE_MAPPING:
                   parts[0] = TYPE_MAPPING[rule_type]
 
-              # 处理 no-resolve
               is_no_resolve = 'no-resolve' in [p.lower() for p in parts]
               
-              # 重组规则：保留 类型 和 值
-              # Rule Set (Classical) 只需要: TYPE, VALUE [,no-resolve]
+              # 重组规则：保留 类型 和 值，去除策略组
               new_line = f"{parts[0]},{parts[1]}"
               
               if is_no_resolve:
@@ -111,7 +102,6 @@ jobs:
               
               new_lines = []
               for line in lines:
-                  # 简单的 [General] 或 [Rule] 标记跳过
                   if line.strip().startswith('[') and line.strip().endswith(']'):
                       continue
                   
@@ -152,7 +142,7 @@ jobs:
           
           # 检查是否有变更，如果有则提交
           if git diff --staged --quiet; then
-            print("No changes to commit.")
+            echo "No changes to commit."
           else
             git commit -m "Auto-convert Surge rules to Mihomo ruleset [skip ci]"
             git push
