@@ -1,0 +1,4 @@
+DOMAIN-SUFFIX,v4.plex.tv
+DOMAIN-SUFFIX,vegasc.top
+PROCESS-NAME,tailscaled
+PROCESS-NAME,Tailscale
