@@ -1,0 +1,84 @@
+name: Update Tailscale DERP IPv6
+
+on:
+  schedule:
+    # 每天北京时间 04:00 (UTC 20:00) 执行一次
+    - cron: '0 20 * * *'
+  workflow_dispatch: # 允许手动触发
+
+# 必须加上写权限
+permissions:
+  contents: write
+
+jobs:
+  update-derp-v6:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Fetch and Generate IPv6 List
+        run: |
+          python <<EOF
+          import requests
+          import json
+          import os
+
+          # 确保目标目录存在
+          os.makedirs('Surge', exist_ok=True)
+
+          url = "https://login.tailscale.com/derpmap/default"
+          try:
+              print(f"Fetching DERP map from {url}...")
+              resp = requests.get(url)
+              resp.raise_for_status()
+              data = resp.json()
+              
+              lines = []
+              # 添加文件头注释 (保留文件用途说明，但去掉具体节点的地区注释)
+              lines.append("# Tailscale Official DERP IPv6 List")
+              lines.append("# Updated automatically via GitHub Actions")
+              lines.append("")
+
+              count = 0
+              if 'Regions' in data:
+                  for region_id, region_data in data['Regions'].items():
+                      nodes = region_data.get('Nodes', [])
+                      for node in nodes:
+                          ipv6 = node.get('IPv6')
+                          # 排除空值和 "none"
+                          if ipv6 and ipv6 != "none":
+                              # Surge Rule Set 格式: IP-CIDR6,地址/128,no-resolve
+                              # 直接写入规则，不带地区注释
+                              lines.append(f"IP-CIDR6,{ipv6}/128,no-resolve")
+                              count += 1
+              
+              output_file = 'Surge/tailscale_derp_v6.conf'
+              with open(output_file, 'w') as f:
+                  f.write('\n'.join(lines))
+              
+              print(f"Success! Extracted {count} IPv6 addresses to {output_file}")
+
+          except Exception as e:
+              print(f"Error: {e}")
+              exit(1)
+          EOF
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add Surge/tailscale_derp_v6.conf
+          # 仅当有变化时才提交
+          git commit -m "Auto-update Tailscale DERP IPv6 list" || echo "No changes to commit"
+          git push
