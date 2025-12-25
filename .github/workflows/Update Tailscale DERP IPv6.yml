@@ -6,6 +6,7 @@ on:
     - cron: '0 20 * * *'
   workflow_dispatch: # 允许手动触发
 
+# 必须加上写权限
 permissions:
   contents: write
 
@@ -44,7 +45,7 @@ jobs:
               data = resp.json()
               
               lines = []
-              # 添加文件头注释 (可选)
+              # 添加文件头注释 (保留文件用途说明，但去掉具体节点的地区注释)
               lines.append("# Tailscale Official DERP IPv6 List")
               lines.append("# Updated automatically via GitHub Actions")
               lines.append("")
@@ -52,15 +53,13 @@ jobs:
               count = 0
               if 'Regions' in data:
                   for region_id, region_data in data['Regions'].items():
-                      region_code = region_data.get('RegionCode', 'Unknown')
                       nodes = region_data.get('Nodes', [])
                       for node in nodes:
                           ipv6 = node.get('IPv6')
                           # 排除空值和 "none"
                           if ipv6 and ipv6 != "none":
                               # Surge Rule Set 格式: IP-CIDR6,地址/128,no-resolve
-                              # 添加注释说明节点名称和区域
-                              lines.append(f"# {region_code} - {node.get('Name')}")
+                              # 直接写入规则，不带地区注释
                               lines.append(f"IP-CIDR6,{ipv6}/128,no-resolve")
                               count += 1
               
