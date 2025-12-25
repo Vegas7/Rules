@@ -1,0 +1,82 @@
+name: Convert Tailscale DERP v6 to Mihomo
+
+on:
+  workflow_dispatch: # 允许手动触发
+  workflow_run:
+    workflows: ["Update Tailscale DERP IPv6"] # 监听上一个 Workflow 的名字
+    types:
+      - completed
+
+permissions:
+  contents: write
+
+jobs:
+  convert-to-mihomo:
+    # 仅当上一个 workflow 成功时才运行
+    if: ${{ github.event.workflow_run.conclusion == 'success' }} || ${{ github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Convert Surge Rule to Mihomo Rule
+        run: |
+          python <<EOF
+          import os
+
+          surge_file = 'Surge/tailscale_derp_v6.conf'
+          mihomo_dir = 'Mihomo'
+          mihomo_file = os.path.join(mihomo_dir, 'tailscale_derp_v6.txt')
+
+          # 确保输入文件存在
+          if not os.path.exists(surge_file):
+              print(f"Error: {surge_file} not found!")
+              exit(1)
+
+          # 确保输出目录存在
+          os.makedirs(mihomo_dir, exist_ok=True)
+
+          print(f"Reading from {surge_file}...")
+          
+          mihomo_rules = []
+          try:
+              with open(surge_file, 'r') as f:
+                  for line in f:
+                      line = line.strip()
+                      # 跳过空行和注释
+                      if not line or line.startswith('#'):
+                          continue
+                      
+                      # 简单的格式校验，确保包含 IP-CIDR6
+                      if 'IP-CIDR6' in line:
+                          # Surge 格式: IP-CIDR6,xxxx,no-resolve
+                          # Mihomo Payload 格式也兼容此写法 (behavior: classical)
+                          # 我们将其添加到 payload 列表中
+                          mihomo_rules.append(f"  - '{line}'")
+
+              # 生成 Mihomo Rule Provider 格式 (YAML Payload)
+              with open(mihomo_file, 'w') as f:
+                  f.write("payload:\n")
+                  f.write('\n'.join(mihomo_rules))
+                  f.write('\n')
+
+              print(f"Success! Converted {len(mihomo_rules)} rules to {mihomo_file}")
+
+          except Exception as e:
+              print(f"Error during conversion: {e}")
+              exit(1)
+          EOF
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add Mihomo/tailscale_derp_v6.txt
+          git commit -m "Auto-convert Tailscale DERP v6 to Mihomo format" || echo "No changes to commit"
+          git push
