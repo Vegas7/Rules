@@ -5,6 +5,8 @@ on:
     # 每天北京时间 04:00 (UTC 20:00) 执行一次
     - cron: '0 20 * * *'
   workflow_dispatch: # 允许手动触发
+permissions:
+  contents: write
 
 jobs:
   update-derp-v6:
