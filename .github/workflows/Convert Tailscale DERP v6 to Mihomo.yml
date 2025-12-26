@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Convert Surge Rule to Mihomo Rule
+      - name: Convert Surge Rule to Mihomo CIDR
         run: |
           python <<EOF
           import os
@@ -41,25 +41,29 @@ jobs:
 
           print(f"Reading from {surge_file}...")
           
-          mihomo_rules = []
+          mihomo_payload = []
           try:
               with open(surge_file, 'r') as f:
                   for line in f:
                       line = line.strip()
+                      # 跳过空行和注释
                       if not line or line.startswith('#'):
                           continue
                       
-                      if 'IP-CIDR6' in line:
-                          # 修改点：去掉了 line 外面的单引号
-                          # 并且确保 IP-CIDR6 后面没有多余的空格干扰
-                          mihomo_rules.append(f"  - {line}")
+                      # 解析 Surge 格式: IP-CIDR6,2607:xxxx/128,no-resolve
+                      parts = line.split(',')
+                      if len(parts) >= 2 and 'IP-CIDR' in parts[0]:
+                          cidr = parts[1].strip()
+                          # 生成标准 YAML 字符串列表项，使用单引号包裹以防解析错误
+                          mihomo_payload.append(f"  - '{cidr}'")
 
+              # 写入文件
               with open(mihomo_file, 'w') as f:
                   f.write("payload:\n")
-                  f.write('\n'.join(mihomo_rules))
+                  f.write('\n'.join(mihomo_payload))
                   f.write('\n')
 
-              print(f"Success! Converted {len(mihomo_rules)} rules to {mihomo_file}")
+              print(f"Success! Converted {len(mihomo_payload)} CIDRs to {mihomo_file}")
 
           except Exception as e:
               print(f"Error during conversion: {e}")
@@ -71,5 +75,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add Mihomo/tailscale_derp_v6.txt
-          git commit -m "Auto-convert Tailscale DERP v6 (Fix format)" || echo "No changes to commit"
+          git commit -m "Auto-convert to Mihomo IP-CIDR format" || echo "No changes to commit"
           git push
