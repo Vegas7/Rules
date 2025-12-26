@@ -24,10 +24,11 @@ jobs:
         with:
           python-version: '3.x'
 
-      - name: Convert Surge Rule to Mihomo CIDR
+      - name: Convert Surge Rule to Plain Text
         run: |
           python <<EOF
           import os
+          import datetime
 
           surge_file = 'Surge/tailscale_derp_v6.conf'
           mihomo_dir = 'Mihomo'
@@ -41,29 +42,31 @@ jobs:
 
           print(f"Reading from {surge_file}...")
           
-          mihomo_payload = []
+          lines_to_write = []
+          # 添加文件头 (模仿你的截图格式)
+          current_time = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+          lines_to_write.append("# Tailscale DERP IPv6 List")
+          lines_to_write.append(f"# Updated: {current_time}")
+          
           try:
               with open(surge_file, 'r') as f:
                   for line in f:
                       line = line.strip()
-                      # 跳过空行和注释
+                      # 跳过空行和原有注释
                       if not line or line.startswith('#'):
                           continue
                       
-                      # 解析 Surge 格式: IP-CIDR6,2607:xxxx/128,no-resolve
-                      parts = line.split(',')
-                      if len(parts) >= 2 and 'IP-CIDR' in parts[0]:
-                          cidr = parts[1].strip()
-                          # 生成标准 YAML 字符串列表项，使用单引号包裹以防解析错误
-                          mihomo_payload.append(f"  - '{cidr}'")
+                      # 只要包含 IP-CIDR6 的行，直接保留原样
+                      if 'IP-CIDR6' in line:
+                          # 格式示例: IP-CIDR6,2607:xxxx/128,no-resolve
+                          lines_to_write.append(line)
 
-              # 写入文件
+              # 写入纯文本文件 (不使用 YAML 格式)
               with open(mihomo_file, 'w') as f:
-                  f.write("payload:\n")
-                  f.write('\n'.join(mihomo_payload))
+                  f.write('\n'.join(lines_to_write))
                   f.write('\n')
 
-              print(f"Success! Converted {len(mihomo_payload)} CIDRs to {mihomo_file}")
+              print(f"Success! Written {len(lines_to_write)} lines to {mihomo_file}")
 
           except Exception as e:
               print(f"Error during conversion: {e}")
@@ -75,5 +78,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add Mihomo/tailscale_derp_v6.txt
-          git commit -m "Auto-convert to Mihomo IP-CIDR format" || echo "No changes to commit"
+          git commit -m "Update Mihomo Tailscale v6 list (Plain Text)" || echo "No changes to commit"
           git push
