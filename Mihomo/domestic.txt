@@ -6,4 +6,4 @@ DOMAIN-KEYWORD,xlliveud
 DOMAIN-KEYWORD,xunlei
 DOMAIN-KEYWORD,yunpan
 DOMAIN-KEYWORD,announce
-DOMAIN-SUFFIX,download.nvidia.com
+DOMAIN-SUFFIX,download.nvidia
