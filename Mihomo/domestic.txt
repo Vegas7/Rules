@@ -6,4 +6,7 @@ DOMAIN-KEYWORD,xlliveud
 DOMAIN-KEYWORD,xunlei
 DOMAIN-KEYWORD,yunpan
 DOMAIN-KEYWORD,announce
+USER-AGENT,Thunder*
+USER-AGENT,XLDownload*
+USER-AGENT,Xunlei*
 # DOMAIN-SUFFIX,download.nvidia.
