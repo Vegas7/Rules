@@ -6,7 +6,9 @@ DOMAIN-KEYWORD,xlliveud
 DOMAIN-KEYWORD,xunlei
 DOMAIN-KEYWORD,yunpan
 DOMAIN-KEYWORD,announce
+DOMAIN,ota.nvidia.com
+DOMAIN,ops-gx.nvidia.com
+DOMAIN,gx-target-experiments-frontend-api.gx.nvidia.com
 USER-AGENT,Thunder*
 USER-AGENT,XLDownload*
 USER-AGENT,Xunlei*
-# DOMAIN-SUFFIX,download.nvidia.
