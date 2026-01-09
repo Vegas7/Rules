@@ -1,2 +1,3 @@
 DOMAIN-SUFFIX,steamcontent.com
 DOMAIN-SUFFIX,steamusercontent.com
+DOMAIN-SUFFIX,dlercloud.com

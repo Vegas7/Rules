@@ -1,4 +1,6 @@
 DOMAIN-SUFFIX,v4.plex.tv
 DOMAIN-SUFFIX,vegasc.top
+DOMAIN-SUFFIX,dler.cloud
+DOMAIN-SUFFIX,dler.pro
 PROCESS-NAME,tailscaled
 PROCESS-NAME,Tailscale
