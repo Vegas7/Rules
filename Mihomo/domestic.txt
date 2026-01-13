@@ -14,5 +14,3 @@ DOMAIN,ota.nvidia.com
 USER-AGENT,Thunder*
 USER-AGENT,XLDownload*
 USER-AGENT,Xunlei*
-# Windows Delivery Optimization
-AND,((DST-PORT,7680), (NETWORK,TCP))
