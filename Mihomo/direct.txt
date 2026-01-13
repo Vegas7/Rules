@@ -6,3 +6,4 @@ PROCESS-NAME,tailscaled
 PROCESS-NAME,Tailscale
 IP-CIDR,103.112.1.61/32,no-resolve
 IP-CIDR,103.238.130.21/32,no-resolve
+IP-CIDR,38.175.105.123/32,no-resolve
