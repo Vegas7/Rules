@@ -1,3 +1,4 @@
+NETWORK,bittorrent
 DOMAIN-KEYWORD,tracker
 DOMAIN-KEYWORD,torrent
 DOMAIN-KEYWORD,aria2
