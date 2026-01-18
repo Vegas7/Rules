@@ -14,3 +14,4 @@ DOMAIN,ota.nvidia.com
 USER-AGENT,Thunder*
 USER-AGENT,XLDownload*
 USER-AGENT,Xunlei*
+AND,((DST-PORT,6881),(NETWORK,UDP))
