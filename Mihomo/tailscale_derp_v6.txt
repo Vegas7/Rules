@@ -1,5 +1,5 @@
 # Tailscale DERP IPv6 List
-# Updated: 2026-01-20 20:37:38 UTC
+# Updated: 2026-01-21 20:19:39 UTC
 IP-CIDR6,2607:f740:f::bc/128,no-resolve
 IP-CIDR6,2607:f740:f::3eb/128,no-resolve
 IP-CIDR6,2607:f740:f::afd/128,no-resolve
