@@ -1,1 +1,2 @@
 DOMAIN-SUFFIX,dlercloud.com
+DOMAIN,monitor.vegasc.top
