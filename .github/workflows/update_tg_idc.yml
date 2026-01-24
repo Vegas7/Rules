@@ -1,0 +1,75 @@
+name: Update Telegram IDC List
+
+on:
+  schedule:
+    # 每天北京时间早上 6:00 运行 (UTC 22:00)
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+    # 允许手动点击按钮触发
+
+permissions:
+  contents: write
+
+jobs:
+  update-list:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch and Convert CIDR
+        run: |
+          # 1. 确保目标目录存在
+          mkdir -p Surge
+          
+          # 2. 定义文件路径
+          FILE_PATH="Surge/telegram_idc.conf"
+          
+          # 3. 写入头部信息 (包含北京时间)
+          # 设置时区为 Asia/Shanghai 以获取正确的日期
+          CURRENT_DATE=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
+          
+          echo "# Telegram Official IDC List" > $FILE_PATH
+          echo "# Source: https://core.telegram.org/resources/cidr.txt" >> $FILE_PATH
+          echo "# Updated: $CURRENT_DATE" >> $FILE_PATH
+          echo "" >> $FILE_PATH
+          
+          # 4. 下载并处理数据
+          # 逻辑：
+          # - 下载 txt 文件
+          # - 逐行读取
+          # - 如果包含冒号(:)则是 IPv6 -> 使用 IP-CIDR6
+          # - 否则是 IPv4 -> 使用 IP-CIDR
+          # - 并在末尾加上 ,no-resolve
+          
+          curl -sL https://core.telegram.org/resources/cidr.txt | while read line; do
+            # 跳过空行
+            if [ -z "$line" ]; then continue; fi
+            
+            if [[ "$line" == *":"* ]]; then
+              echo "IP-CIDR6,$line,no-resolve" >> $FILE_PATH
+            else
+              echo "IP-CIDR,$line,no-resolve" >> $FILE_PATH
+            fi
+          done
+          
+          # 打印一下结果的前几行用于日志检查
+          echo "Generated file header content:"
+          head -n 10 $FILE_PATH
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 添加文件
+          git add Surge/telegram_idc.conf
+          
+          # 检查是否有变化，有变化才提交
+          if git diff --staged --quiet; then
+            echo "No changes detected. Skipping commit."
+          else
+            git commit -m "Auto-update Telegram IDC list: $(TZ='Asia/Shanghai' date '+%Y-%m-%d')"
+            git push
+          fi
