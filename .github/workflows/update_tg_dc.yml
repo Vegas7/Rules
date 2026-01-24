@@ -1,4 +1,4 @@
-name: Update Telegram IDC List
+name: Update Telegram DC List
 
 on:
   schedule:
@@ -24,13 +24,13 @@ jobs:
           mkdir -p Surge
           
           # 2. 定义文件路径
-          FILE_PATH="Surge/telegram_idc.conf"
+          FILE_PATH="Surge/telegram_dc.conf"
           
           # 3. 写入头部信息 (包含北京时间)
           # 设置时区为 Asia/Shanghai 以获取正确的日期
           CURRENT_DATE=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
           
-          echo "# Telegram Official IDC List" > $FILE_PATH
+          echo "# Telegram Official DC List" > $FILE_PATH
           echo "# Source: https://core.telegram.org/resources/cidr.txt" >> $FILE_PATH
           echo "# Updated: $CURRENT_DATE" >> $FILE_PATH
           echo "" >> $FILE_PATH
@@ -64,12 +64,12 @@ jobs:
           git config --local user.name "github-actions[bot]"
           
           # 添加文件
-          git add Surge/telegram_idc.conf
+          git add Surge/telegram_dc.conf
           
           # 检查是否有变化，有变化才提交
           if git diff --staged --quiet; then
             echo "No changes detected. Skipping commit."
           else
-            git commit -m "Auto-update Telegram IDC list: $(TZ='Asia/Shanghai' date '+%Y-%m-%d')"
+            git commit -m "Auto-update Telegram DC list: $(TZ='Asia/Shanghai' date '+%Y-%m-%d')"
             git push
           fi
