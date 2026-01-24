@@ -91,14 +91,6 @@ jobs:
               if rule_type in TYPE_MAPPING:
                   parts[0] = TYPE_MAPPING[rule_type]
 
-              # --- [修复开始] 特殊处理 IP 规则 ---
-              # Mihomo 的 ipcidr 类型 rule-set 仅支持纯 IP/CIDR 列表
-              # 如果保留 'IP-CIDR,' 前缀或 ',no-resolve' 会导致加载失败
-              if parts[0] in ['IP-CIDR', 'IP-CIDR6']:
-                  # 直接返回 IP 地址部分 (parts[1]), 忽略其他参数
-                  return parts[1] + comment
-              # --- [修复结束] ---
-
               is_no_resolve = 'no-resolve' in [p.lower() for p in parts]
               
               # 重组规则：保留 类型 和 值，去除策略组
