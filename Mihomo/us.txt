@@ -1,4 +1,5 @@
-DOMAIN-SUFFIX,playthebazaar.com
-DOMAIN-SUFFIX,ign.com
 DOMAIN-SUFFIX,pluto.tv
 DOMAIN-SUFFIX,plutotv.net
+DOMAIN-SUFFIX,playthebazaar.com
+DOMAIN-SUFFIX,ign.com
+DOMAIN-SUFFIX,nodeseek.com
