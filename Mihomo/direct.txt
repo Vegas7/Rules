@@ -3,7 +3,5 @@ DOMAIN-SUFFIX,vegasc.top
 DOMAIN-SUFFIX,dler.cloud
 DOMAIN-SUFFIX,dler.pro
 DOMAIN-SUFFIX,humblebundle.com
-PROCESS-NAME,tailscaled
-PROCESS-NAME,Tailscale
 IP-CIDR,103.112.1.61/32,no-resolve
 IP-CIDR,103.238.130.21/32,no-resolve
