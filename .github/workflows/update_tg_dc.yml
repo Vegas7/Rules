@@ -31,39 +31,36 @@ jobs:
           # 3. 获取当前时间 (北京时间)
           CURRENT_DATE=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
           
-          # 4. 写入头部注释 - Surge
+          # 4. 写入头部注释
+          # Surge
           echo "# Telegram Official DC List (Surge)" > $SURGE_FILE
           echo "# Source: https://core.telegram.org/resources/cidr.txt" >> $SURGE_FILE
           echo "# Updated: $CURRENT_DATE" >> $SURGE_FILE
           echo "" >> $SURGE_FILE
 
-          # 5. 写入头部注释 - Mihomo (支持 # 注释)
+          # Mihomo (纯文本格式，通常只加简单的井号注释)
           echo "# Telegram Official DC List (Mihomo/Clash)" > $MIHOMO_FILE
           echo "# Source: https://core.telegram.org/resources/cidr.txt" >> $MIHOMO_FILE
           echo "# Updated: $CURRENT_DATE" >> $MIHOMO_FILE
           echo "" >> $MIHOMO_FILE
           
-          # 6. 下载并分流处理数据
-          # 逻辑：直接读取官方源，一行一行处理，同时写入两个文件，效率最高。
-          
+          # 5. 下载并分流处理数据
           curl -sL https://core.telegram.org/resources/cidr.txt | while read line; do
             # 跳过空行
             if [ -z "$line" ]; then continue; fi
             
-            # --- 处理 Surge 格式 ---
-            # 区分 IPv6 使用 IP-CIDR6
+            # --- 处理 Surge 格式 (带前缀和参数) ---
             if [[ "$line" == *":"* ]]; then
               echo "IP-CIDR6,$line,no-resolve" >> $SURGE_FILE
             else
               echo "IP-CIDR,$line,no-resolve" >> $SURGE_FILE
             fi
             
-            # --- 处理 Mihomo 格式 ---
-            # Mihomo 纯文本 Rule Provider 只需要纯 CIDR，不需要前缀
+            # --- 处理 Mihomo 格式 (保持纯净 IP) ---
             echo "$line" >> $MIHOMO_FILE
           done
           
-          # 7. 打印预览 (方便在 Actions 日志中检查)
+          # 6. 打印预览
           echo "=== Surge File Preview ==="
           head -n 6 $SURGE_FILE
           echo "..."
@@ -75,7 +72,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # 添加两个文件
+          # 添加文件
           git add Surge/telegram_dc.conf
           git add Mihomo/telegram_dc.txt
           
