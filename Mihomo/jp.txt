@@ -1,5 +1,6 @@
 DOMAIN-SUFFIX,games.geforce.com
 DOMAIN-SUFFIX,geforcenow.com
-IP-CIDR,45.207.157.28/32,no-resolve
-IP-CIDR,154.29.154.240/32,no-resolve
 IP-CIDR,103.102.6.66/32,no-resolve
+IP-CIDR,185.150.138.72/32,no-resolve
+IP-CIDR,155.117.19.178,no-resolve
+IP-CIDR,151.240.13.55/32,no-resolve
