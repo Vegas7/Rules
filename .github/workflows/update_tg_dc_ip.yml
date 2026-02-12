@@ -47,6 +47,7 @@ jobs:
             else
               echo "IP-CIDR,$line,no-resolve" >> $SURGE_FILE
             fi
+          done
 
           # 6. 打印预览
           echo "=== Surge File Preview ==="
