@@ -22,11 +22,9 @@ jobs:
         run: |
           # 1. 准备目录
           mkdir -p Surge
-          mkdir -p Mihomo
           
           # 2. 定义文件路径
           SURGE_FILE="Surge/telegram_dc_ip.conf"
-          MIHOMO_FILE="Mihomo/telegram_dc_ip.txt"
           
           # 3. 获取当前时间 (北京时间)
           CURRENT_DATE=$(TZ='Asia/Shanghai' date '+%Y-%m-%d %H:%M:%S')
@@ -37,12 +35,6 @@ jobs:
           echo "# Source: https://core.telegram.org/resources/cidr.txt" >> $SURGE_FILE
           echo "# Updated: $CURRENT_DATE" >> $SURGE_FILE
           echo "" >> $SURGE_FILE
-
-          # Mihomo (纯文本格式，通常只加简单的井号注释)
-          echo "# Telegram Official DC List (Mihomo/Clash)" > $MIHOMO_FILE
-          echo "# Source: https://core.telegram.org/resources/cidr.txt" >> $MIHOMO_FILE
-          echo "# Updated: $CURRENT_DATE" >> $MIHOMO_FILE
-          echo "" >> $MIHOMO_FILE
           
           # 5. 下载并分流处理数据
           curl -sL https://core.telegram.org/resources/cidr.txt | while read line; do
@@ -55,17 +47,10 @@ jobs:
             else
               echo "IP-CIDR,$line,no-resolve" >> $SURGE_FILE
             fi
-            
-            # --- 处理 Mihomo 格式 (保持纯净 IP) ---
-            echo "$line" >> $MIHOMO_FILE
-          done
-          
+
           # 6. 打印预览
           echo "=== Surge File Preview ==="
           head -n 6 $SURGE_FILE
-          echo "..."
-          echo "=== Mihomo File Preview ==="
-          head -n 6 $MIHOMO_FILE
 
       - name: Commit and Push
         run: |
@@ -74,7 +59,6 @@ jobs:
           
           # 添加文件
           git add Surge/telegram_dc_ip.conf
-          git add Mihomo/telegram_dc_ip.txt
           
           # 检查是否有变化
           if git diff --staged --quiet; then
