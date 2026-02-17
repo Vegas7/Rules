@@ -2,6 +2,7 @@ DOMAIN-SUFFIX,v4.plex.tv
 DOMAIN-SUFFIX,vegasc.top
 DOMAIN-SUFFIX,dler.cloud
 DOMAIN-SUFFIX,dler.pro
+DOMAIN-SUFFIX,oics.net
 DOMAIN-SUFFIX,humblebundle.com
 IP-CIDR,103.112.1.61/32,no-resolve
 IP-CIDR,82.40.34.66/32,no-resolve
