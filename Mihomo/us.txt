@@ -3,3 +3,5 @@ DOMAIN-SUFFIX,plutotv.net
 DOMAIN-SUFFIX,playthebazaar.com
 DOMAIN-SUFFIX,ign.com
 DOMAIN-KEYWORD,intel.com
+DOMAIN-SUFFIX,javdb.com
+DOMAIN-SUFFIX,jdbstatic.com
