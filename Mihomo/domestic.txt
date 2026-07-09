@@ -18,3 +18,4 @@ USER-AGENT,Xunlei*
 AND,((DST-PORT,6881),(NETWORK,UDP))
 PROCESS-NAME,Thunder
 DOMAIN-SUFFIX,cf.longemby.com
+DOMAIN-SUFFIX,smart.uhdnow.com
