@@ -19,3 +19,4 @@ AND,((DST-PORT,6881),(NETWORK,UDP))
 PROCESS-NAME,Thunder
 DOMAIN-KEYWORD,longemby
 DOMAIN-KEYWORD,uhdnow
+DOMAIN-SUFFIX,cloudflarestorage.com

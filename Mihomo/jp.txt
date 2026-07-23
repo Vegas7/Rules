@@ -2,6 +2,15 @@ DOMAIN-SUFFIX,games.geforce.com
 DOMAIN-SUFFIX,geforcenow.com
 DOMAIN-SUFFIX,exitgames.com
 DOMAIN-SUFFIX,dmm.co.jp
+DOMAIN-SUFFIX,wetest.net
+DOMAIN-SUFFIX,ingest.sentry.io
+DOMAIN-SUFFIX,playerinfinite.com
+DOMAIN-SUFFIX,outweisurvey.com
+DOMAIN-SUFFIX,listdl.com
+DOMAIN-SUFFIX,jupiterlauncher.com
+DOMAIN-SUFFIX,fleetlogd.com
+DOMAIN-SUFFIX,blablalink.com
+DOMAIN-SUFFIX,levelinfinite.com
 IP-CIDR,38.175.103.242/32,no-resolve
 IP-CIDR,194.114.138.170/32,no-resolve
 IP-CIDR,155.117.19.178/32,no-resolve
