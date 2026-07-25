@@ -4,14 +4,8 @@ DOMAIN-SUFFIX,dler.pro
 DOMAIN-SUFFIX,oics.net
 DOMAIN-SUFFIX,po0.com
 DOMAIN-SUFFIX,humblebundle.com
-DOMAIN-SUFFIX,ams-premium-ipv4.lg.xtom.com
+DOMAIN-SUFFIX,lg.xtom.com
 IP-CIDR,45.89.235.98/32,no-resolve
-IP-CIDR,103.112.1.61/32,no-resolve
 IP-CIDR,82.40.34.207/32,no-resolve
-IP-CIDR,23.249.19.121/32,no-resolve
 IP-CIDR,64.186.229.140/32,no-resolve
 IP-CIDR,45.131.71.84/32,no-resolve
-IP-CIDR,45.147.48.147/32,no-resolve
-# IP-CIDR,38.55.39.19/32,no-resolve
-IP-CIDR,192.109.228.135/32,no-resolve
-IP-CIDR,78.142.195.215/32,no-resolve
