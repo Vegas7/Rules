@@ -18,7 +18,8 @@ USER-AGENT,Xunlei*
 AND,((DST-PORT,6881),(NETWORK,UDP))
 PROCESS-NAME,Thunder
 DOMAIN-SUFFIX,cloudflarestorage.com
-DOMAIN-KEYWORD,longemby
+DOMAIN-SUFFIX,longemby.com
+DOMAIN-SUFFIX,longemby.top
 DOMAIN,www.uhdnow.com
 DOMAIN,smart.uhdnow.com
 DOMAIN,speed.uhdnow.com
