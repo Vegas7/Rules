@@ -9,3 +9,4 @@ DOMAIN-SUFFIX,lg.xtom.com
 # IP-CIDR,82.40.34.207/32,no-resolve
 # IP-CIDR,64.186.229.140/32,no-resolve
 # IP-CIDR,45.131.71.84/32,no-resolve
+IP-CIDR,179.255.117.180/32,no-resolve
