@@ -1,0 +1,4 @@
+DOMAIN-SUFFIX,javdb.com
+DOMAIN-SUFFIX,jdbstatic.com
+DOMAIN,cf.longemby.com
+DOMAIN-SUFFIX,longemby.live
