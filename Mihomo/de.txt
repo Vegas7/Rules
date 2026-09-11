@@ -1,2 +1,3 @@
 DOMAIN-SUFFIX,yandex.ru
+DOMAIN-SUFFIX,yandex.net
 DOMAIN-SUFFIX,yandex.com
