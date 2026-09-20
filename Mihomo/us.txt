@@ -4,5 +4,19 @@ DOMAIN-SUFFIX,ign.com
 DOMAIN-SUFFIX,spideytracker.net
 DOMAIN-SUFFIX,javdb.com
 DOMAIN-SUFFIX,jdbstatic.com
+# 用户上传/长尾媒体
 DOMAIN-SUFFIX,discordapp.com
 DOMAIN-SUFFIX,discordapp.net
+DOMAIN-SUFFIX,redd.it
+DOMAIN-SUFFIX,redditmedia.com
+# 无 CDN 或弱 CDN 的大文件
+DOMAIN-SUFFIX,archive.org
+DOMAIN-SUFFIX,dropboxusercontent.com
+DOMAIN-SUFFIX,huggingface.co
+DOMAIN-SUFFIX,hf.co
+# AWS S3 美国区域直链（Notion、Figma 等附件大多是这类签名 URL）
+DOMAIN-WILDCARD,*.s3.us-*.amazonaws.com
+DOMAIN,s3.amazonaws.com
+# GitHub 源码包/Release（先测再加）
+DOMAIN,release-assets.githubusercontent.com
+DOMAIN,objects.githubusercontent.com
