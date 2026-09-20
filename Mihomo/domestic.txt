@@ -1,4 +1,3 @@
-NETWORK,bittorrent
 DOMAIN-KEYWORD,torrent
 DOMAIN-KEYWORD,aria2
 DOMAIN-KEYWORD,xlliveud
