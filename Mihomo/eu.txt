@@ -2,3 +2,4 @@ DOMAIN-SUFFIX,yandex.ru
 DOMAIN-SUFFIX,yandex.net
 DOMAIN-SUFFIX,yandex.com
 DOMAIN-SUFFIX,nodeseek.com
+DOMAIN-SUFFIX,nodeseek.org
